@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flyingyoo.flyinglist.R
 import com.flyingyoo.flyinglist.base.BaseRecyclerViewAdapter
 import com.flyingyoo.flyinglist.databinding.ViewListItemBinding
-import com.flyingyoo.flyinglist.dto.ListItem
+import com.flyingyoo.flyinglist.data.dto.ListItem
 
 class RecyclerListItemAdapter : BaseRecyclerViewAdapter<ListItem, RecyclerListItemAdapter.ItemViewHolder> {
 

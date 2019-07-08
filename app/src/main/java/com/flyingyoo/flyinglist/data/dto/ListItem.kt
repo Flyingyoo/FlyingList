@@ -1,4 +1,4 @@
-package com.flyingyoo.flyinglist.dto
+package com.flyingyoo.flyinglist.data.dto
 
 import androidx.room.PrimaryKey
 
@@ -10,4 +10,7 @@ data class ListItem(
     , var viewCount: Int? = 0
     , var createTime: Long? = 0L
     , var editedTime: Long? = 0L
-)
+)/*{
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0
+}*/

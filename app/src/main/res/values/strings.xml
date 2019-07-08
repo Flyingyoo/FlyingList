@@ -4,6 +4,7 @@
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="delete">Delete</string>
+    <string name="main_title">Flying List</string>
     <string name="main_btn_add_item">Add item</string>
     <string name="main_left_items">items left</string>
     <string name="main_btn_clear_completed">Clear completed</string>
