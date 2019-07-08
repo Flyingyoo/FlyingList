@@ -7,21 +7,133 @@
 
     <data>
         <variable name="activity" type="com.flyingyoo.flyinglist.activity.MainActivity"/>
+        <variable name="itemCount" type="Integer"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            >
+            android:focusable="true"
+            android:clickable="true"
+    >
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                android:padding="@dimen/_10dp"
+        >
 
-        <TextView
+            <Spinner
+                    android:id="@+id/spn_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:entries="@array/filter_list"
+            />
+
+            <Button
+                    android:id="@+id/btn_clear_completed"
+                    android:layout_width="wrap_content"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@id/spn_filter"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:text="@string/main_btn_clear_completed"
+                    android:textColor="@color/color_3282e4"
+                    android:background="@null"
+                    android:minHeight="@dimen/_0dp"
+                    android:onClick="@{v -> activity.showClearDialog()}"
+            />
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_item_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/spn_filter"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_add_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/rv_item_list"
+                    android:visibility="gone"
+            >
+                <EditText
+                        android:id="@+id/et_add_item"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:padding="@dimen/_10dp"
+                        android:hint="@string/item_hint"
+                        android:background="@null"
+                        android:inputType="textMultiLine"
+                />
+
+                <Button
+                        android:id="@+id/btn_confirm"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:background="@null"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/et_add_item"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:text="@string/confirm"
+                        android:textColor="@color/color_3282e4"
+                        android:onClick="@{v -> activity.confirmItem()}"
+                />
+
+                <Button
+                        android:id="@+id/btn_cancel"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:background="@null"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/et_add_item"
+                        app:layout_constraintEnd_toStartOf="@id/btn_confirm"
+                        android:text="@string/cancel"
+                        android:textColor="@color/color_ff4848"
+                        android:onClick="@{v -> activity.cancelItem()}"
+                />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Button
+                    style="?android:borderlessButtonStyle"
+                    android:id="@+id/btn_add_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/cl_add_item"
+                    android:textColor="@color/color_3282e4"
+                    android:text="@string/main_btn_add_item"
+                    android:background="@color/color_f0f0f0"
+                    android:minHeight="@dimen/_0dp"
+                    android:padding="@dimen/_10dp"
+                    android:layout_margin="@dimen/_5dp"
+                    android:onClick="@{v -> activity.addItem()}"
+            />
+
+            <TextView
+                    android:id="@+id/tv_left_cnt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/btn_add_item"
+                    android:layout_margin="@dimen/_5dp"
+                    android:text='@{itemCount + " " + @string/main_left_items}'
+                    android:textColor="@color/color_333333"
+            />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+                android:id="@+id/btn_test"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hello World!"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+        />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

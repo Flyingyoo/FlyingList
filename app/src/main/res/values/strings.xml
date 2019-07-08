@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">FlyingList</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="delete">Delete</string>
+    <string name="main_btn_add_item">Add item</string>
+    <string name="main_left_items">items left</string>
+    <string name="main_btn_clear_completed">Clear completed</string>
+    <string name="item_hint">Write todo task here.</string>
+
+    <string name="msg_please_fill_content">Please, write todo task here.</string>
+    <string name="msg_sure_to_delete">Sure to delete this?</string>
+    <string name="msg_sure_to_clear">Sure to clear completed lists?</string>
+
 </resources>

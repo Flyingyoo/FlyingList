@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import
+                alias="View"
+                type="android.view.View"
+        />
+
+        <variable name="item" type="com.flyingyoo.flyinglist.dto.ListItem"/>
+    </data>
+
+    <!--
+        flyingyoo.
+        there is an issue for using constraint layout for root layout.
+        that's why I used Relative layout.
+    -->
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <TextView
+                android:id="@+id/tv_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:padding="@dimen/_10dp"
+                android:background="@null"
+                android:maxLength="300"
+                android:textSize="@dimen/_17dp"
+                android:textColor="@color/color_333333"
+                android:text="@{item.contents}"
+                android:maxLines="3"
+        />
+
+    </RelativeLayout>
+</layout>

@@ -13,5 +13,22 @@ class ItemEditActivity : BaseActivity<ActivityItemEditBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        b.activity = this
+    }
+
+    fun showDeleteDialog() {
+
+    }
+
+    fun deleteItem() {
+
+    }
+
+    fun confirmItem() {
+
+    }
+
+    fun exit() {
+        finish()
     }
 }
