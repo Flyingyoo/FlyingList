@@ -6,10 +6,20 @@ import android.os.Bundle
 import android.widget.Toast
 import com.flyingyoo.flyinglist.R
 import com.flyingyoo.flyinglist.base.BaseActivity
+import com.flyingyoo.flyinglist.constant.Constants
+import com.flyingyoo.flyinglist.data.database.ItemDB
+import com.flyingyoo.flyinglist.data.dto.ListItem
 import com.flyingyoo.flyinglist.databinding.ActivityEditItemBinding
 import com.flyingyoo.flyinglist.util.CommonUtils
+import com.flyingyoo.flyinglist.util.DLog
+import com.google.gson.GsonBuilder
 
 class EditItemActivity : BaseActivity<ActivityEditItemBinding>() {
+
+    private var db: ItemDB? = null
+
+    private var itemId: Int = 0
+    private var item: ListItem? = null
 
     override fun getLayoutId(): Int {
         return R.layout.activity_edit_item
@@ -18,6 +28,11 @@ class EditItemActivity : BaseActivity<ActivityEditItemBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         b.activity = this
+
+        db = ItemDB.getInstance(context)
+        itemId = intent.getIntExtra(Constants.ID, 0)
+
+        getItemFromDB(itemId)
     }
 
     fun showDeleteDialog() {
@@ -54,4 +69,15 @@ class EditItemActivity : BaseActivity<ActivityEditItemBinding>() {
     fun exit() {
         finishWithAnimation(R.anim.anim_no_animation, R.anim.anim_drop_down)
     }
+
+    private fun getItemFromDB(itemId: Int) {
+        Thread {
+            item = db!!.itemDao().getItem(itemId)
+            DLog.e(GsonBuilder().setPrettyPrinting().create().toJson(item))
+        }.start()
+    }
+
+    private fun deleteItemFromDB(item: ListItem) = Thread { db!!.itemDao().delete(item) }.start()
+    private fun updateFromDB(item: ListItem) = Thread { db!!.itemDao().update(item) }.start()
+
 }

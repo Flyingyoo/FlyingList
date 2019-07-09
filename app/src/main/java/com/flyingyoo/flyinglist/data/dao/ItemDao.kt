@@ -1,26 +1,32 @@
 package com.flyingyoo.flyinglist.data.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
+import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
-import androidx.room.Query
 import com.flyingyoo.flyinglist.constant.Constants
 import com.flyingyoo.flyinglist.data.dto.ListItem
 
 @Dao
 interface ItemDao {
 
-    companion object {
-        const val COMPLETED = "completed"
-    }
-
     @Query("select * from ${Constants.TABLE_NAME}")
     fun getAll(): MutableList<ListItem>
+
+    @Query("select * from ${Constants.TABLE_NAME} where ${Constants.ID} = :id")
+    fun getItem(id: Int) : ListItem
+
+    @Query("select * from ${Constants.TABLE_NAME} where ${Constants.COMPLETED} = :completed")
+    fun getItemByCompleted(completed: Boolean)
 
     @Insert(onConflict = REPLACE)
     fun insert(item: ListItem)
 
-    //fun update(item: ListItem) {}
+    @Update(onConflict = REPLACE)
+    fun update(item: ListItem)
+
+    @Delete
+    fun delete(item : ListItem)
+
+
 
 //    @Query("delete from $TABLE_NAME where $COMPLETED")
 //    fun deleteCompleted()

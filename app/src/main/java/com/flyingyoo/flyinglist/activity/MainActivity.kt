@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import com.flyingyoo.flyinglist.R
@@ -52,7 +53,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
         adapter.onItemClickListener = object : BaseRecyclerViewAdapter.OnItemClickListener {
             override fun onItemClick(view: View, position: Int) {
+                val item = items[position]
                 val intent = Intent(context, EditItemActivity::class.java)
+                intent.putExtra(Constants.ID, item.id)
+                //item.viewCount++
+                //db!!.itemDao().update(item)
                 startActivityForResultWithAnimation(intent, Constants.REQ_EDIT_ITEM, R.anim.anim_rise_up, R.anim.anim_no_animation)
             }
         }
@@ -61,8 +66,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         b.rvItemList.adapter = adapter
         b.rvItemList.isNestedScrollingEnabled = false
         LinearSnapHelper().attachToRecyclerView(b.rvItemList)
-
-        getItemDB().start()
+        getItemsFromDB()
     }
 
     private fun initFilterSpinner() {
@@ -89,17 +93,24 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
-    private fun getItemDB() : Thread {
-        return Thread {
+    private fun getItemsFromDB() {
+        Thread {
+            items.clear()
             items.addAll(db!!.itemDao().getAll())
-            DLog.e("접속 성공!" + GsonBuilder().setPrettyPrinting().create().toJson(db!!.itemDao().getAll()))
-        }
+        }.start()
+        adapter.notifyDataSetChanged()
     }
 
-    private fun insertItem(item: ListItem) : Thread {
-        return Thread {
-            db!!.itemDao().insert(item)
-        }
+    private fun insertItemToDB(item: ListItem) {
+        Thread { db!!.itemDao().insert(item) }.start()
+    }
+
+    private fun deleteItemFromDB(item: ListItem) {
+        Thread { db!!.itemDao().delete(item) }.start()
+    }
+
+    private fun clearCompleted() {
+
     }
 
     fun addItem() {
@@ -123,10 +134,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             })
     }
 
-    private fun clearCompleted() {
-
-    }
-
     fun confirmItem() {
         if (b.etAddItem.text.toString().trim() == "") {
             Toast.makeText(context, R.string.msg_please_fill_content, Toast.LENGTH_SHORT).show()
@@ -134,14 +141,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         val item = ListItem(null, false, b.etAddItem.text.toString().trim(), 0, System.currentTimeMillis(), 0L)
-        items.add(item)
         DLog.e(GsonBuilder().setPrettyPrinting().create().toJson(item))
-        adapter.notifyItemInserted(adapter.itemCount - 1)
+        insertItemToDB(item).also {
+            getItemsFromDB()
+        }
+
         b.etAddItem.setText("")
         b.etAddItem.requestFocus()
-
-        insertItem(item).start()
-        //b.nsvItems.fullScroll(NestedScrollView.FOCUS_DOWN)
+//        b.nsvItems.postDelayed({
+//            b.nsvItems.fullScroll(NestedScrollView.FOCUS_DOWN)
+//        }, 100)
     }
 
     fun cancelItem() {
@@ -154,5 +163,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        db!!.close()
     }
 }

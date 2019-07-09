@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.flyingyoo.flyinglist.constant.Constants.Companion.DB_NAME
+import com.flyingyoo.flyinglist.constant.Constants
+
 import com.flyingyoo.flyinglist.data.dao.ItemDao
 import com.flyingyoo.flyinglist.data.dto.ListItem
 
@@ -15,14 +16,13 @@ abstract class ItemDB : RoomDatabase() {
 
     companion object {
 
-
         private var INSTANCE: ItemDB? = null
         fun getInstance(context: Context): ItemDB? {
             if (INSTANCE == null) {
                 synchronized(ItemDB::class) {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
-                        ItemDB::class.java, DB_NAME
+                        ItemDB::class.java, Constants.DB_NAME
                     )
                         .fallbackToDestructiveMigration()
                         .build()
