@@ -9,7 +9,7 @@
                 type="android.view.View"
         />
 
-        <variable name="item" type="com.flyingyoo.flyinglist.dto.ListItem"/>
+        <variable name="item" type="com.flyingyoo.flyinglist.data.dto.ListItem"/>
     </data>
 
     <!--

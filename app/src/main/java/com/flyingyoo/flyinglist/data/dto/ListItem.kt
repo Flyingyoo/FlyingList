@@ -3,7 +3,7 @@ package com.flyingyoo.flyinglist.data.dto
 import androidx.room.PrimaryKey
 
 data class ListItem(
-    @PrimaryKey
+    //@PrimaryKey
     var id: String? = ""
     , var completed : Boolean? = false
     , var contents: String? = ""

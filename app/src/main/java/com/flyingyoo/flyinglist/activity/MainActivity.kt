@@ -12,7 +12,6 @@ import com.flyingyoo.flyinglist.adapter.RecyclerListItemAdapter
 import com.flyingyoo.flyinglist.base.BaseActivity
 import com.flyingyoo.flyinglist.base.BaseRecyclerViewAdapter
 import com.flyingyoo.flyinglist.constant.Constants
-import com.flyingyoo.flyinglist.data.database.ItemDataBase
 import com.flyingyoo.flyinglist.databinding.ActivityMainBinding
 import com.flyingyoo.flyinglist.data.dto.ListItem
 import com.flyingyoo.flyinglist.util.CommonUtils
@@ -26,7 +25,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private lateinit var adapter: RecyclerListItemAdapter
-    private var db : ItemDataBase? = null
     private val items: MutableList<ListItem> = arrayListOf()
 
 
@@ -36,7 +34,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        db = ItemDataBase.getInstance(context)
 
         b.activity = this
         b.itemCount = 0
