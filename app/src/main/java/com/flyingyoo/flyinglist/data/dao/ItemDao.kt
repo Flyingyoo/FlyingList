@@ -7,16 +7,6 @@ import com.flyingyoo.flyinglist.data.dto.ListItem
 
 @Dao
 interface ItemDao {
-
-    @Query("select * from ${Constants.TABLE_NAME}")
-    fun getAll(): MutableList<ListItem>
-
-    @Query("select * from ${Constants.TABLE_NAME} where ${Constants.ID} = :id")
-    fun getItem(id: Int) : ListItem
-
-    @Query("select * from ${Constants.TABLE_NAME} where ${Constants.COMPLETED} = :completed")
-    fun getItemByCompleted(completed: Boolean)
-
     @Insert(onConflict = REPLACE)
     fun insert(item: ListItem)
 
@@ -24,13 +14,20 @@ interface ItemDao {
     fun update(item: ListItem)
 
     @Delete
-    fun delete(item : ListItem)
+    fun delete(item: ListItem)
 
+    @Query("select * from ${Constants.TABLE_NAME}")
+    fun getAll(): MutableList<ListItem>
 
+    @Query("select * from ${Constants.TABLE_NAME} where ${Constants.ID} = :id")
+    fun getItem(id: Int): ListItem
 
-//    @Query("delete from $TABLE_NAME where $COMPLETED")
-//    fun deleteCompleted()
+    @Query("select count(*) from ${Constants.TABLE_NAME}")
+    fun getActiveCount(): Int
 
-//    @Query("delete from ${Constants.TABLE_NAME}")
-//    fun delete(id: Int)
+    @Query("select * from ${Constants.TABLE_NAME} where ${Constants.COMPLETED} = :completed")
+    fun getItemByCompleted(completed: Boolean): MutableList<ListItem>
+
+    @Query("delete from ${Constants.TABLE_NAME} where ${Constants.COMPLETED}")
+    fun deleteCompleted()
 }

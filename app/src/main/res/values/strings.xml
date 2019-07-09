@@ -10,8 +10,14 @@
     <string name="main_btn_clear_completed">Clear completed</string>
     <string name="item_hint">Write todo task here.</string>
 
+    <string name="edit_created_time">Created time :</string>
+    <string name="edit_edited_time">Last edited time :</string>
+
     <string name="msg_please_fill_content">Please, write todo task here.</string>
     <string name="msg_sure_to_delete">Sure to delete this?</string>
     <string name="msg_sure_to_clear">Sure to clear completed lists?</string>
 
+
+
 </resources>
+

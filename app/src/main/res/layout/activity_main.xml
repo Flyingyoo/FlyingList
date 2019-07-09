@@ -28,6 +28,14 @@
                 android:textSize="@dimen/_26dp"
         />
 
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:onClick="@{v -> activity.test()}"
+        />
+
         <Spinner
                 android:id="@+id/spn_filter"
                 android:layout_width="wrap_content"

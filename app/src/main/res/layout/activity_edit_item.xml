@@ -10,9 +10,14 @@
         <variable
                 name="activity"
                 type="com.flyingyoo.flyinglist.activity.EditItemActivity"/>
-        <!--    <import
-                    alias="View"
-                    type="android.view.View"/>-->
+
+        <variable
+                name="item"
+                type="com.flyingyoo.flyinglist.data.dto.ListItem"/>
+
+        <import
+                alias="View"
+                type="android.view.View"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,10 +48,30 @@
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_date_info"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_30dp"
+                android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/cl_header"
-                android:background="@color/color_999999"
         >
+
+            <TextView
+                    android:id="@+id/tv_create_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toTopOf="@id/tv_edit_date"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:padding="@dimen/_5dp"
+                    android:textColor="@color/color_333333"
+            />
+
+            <TextView
+                    android:id="@+id/tv_edit_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:padding="@dimen/_5dp"
+                    android:visibility='@{item.editedTime == 0L ? View.GONE : View.VISIBLE}'
+                    android:textColor="@color/color_333333"
+            />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

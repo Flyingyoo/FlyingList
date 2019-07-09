@@ -17,6 +17,7 @@ import com.flyingyoo.flyinglist.constant.Constants
 import com.flyingyoo.flyinglist.data.database.ItemDB
 import com.flyingyoo.flyinglist.databinding.ActivityMainBinding
 import com.flyingyoo.flyinglist.data.dto.ListItem
+import com.flyingyoo.flyinglist.security.SecurityUtils
 import com.flyingyoo.flyinglist.util.CommonUtils
 import com.flyingyoo.flyinglist.util.DLog
 import com.google.gson.GsonBuilder
@@ -32,7 +33,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private lateinit var adapter: RecyclerListItemAdapter
     private var db: ItemDB? = null
     private val items: MutableList<ListItem> = mutableListOf()
-
+    private var completedIndex = IDX_ALL
 
     override fun getLayoutId(): Int {
         return R.layout.activity_main
@@ -40,12 +41,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        db = ItemDB.getInstance(context)
-        b.activity = this
-        b.itemCount = 0
+        if (!SecurityUtils.RootingCheck.checkDevice(this)) {
+            db = ItemDB.getInstance(context)
+            b.activity = this
+            b.itemCount = 0
 
-        initRecycler()
-        initFilterSpinner()
+            initRecycler()
+            initFilterSpinner()
+        }
     }
 
     private fun initRecycler() {
@@ -66,25 +69,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         b.rvItemList.adapter = adapter
         b.rvItemList.isNestedScrollingEnabled = false
         LinearSnapHelper().attachToRecyclerView(b.rvItemList)
-        getItemsFromDB()
+        getAll()
     }
 
     private fun initFilterSpinner() {
         b.spnFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
-                when (i) {
-                    IDX_ALL -> {
-                        Toast.makeText(context, "IDX_ALL", Toast.LENGTH_SHORT).show()
-                    }
-
-                    IDX_ACTIVE -> {
-                        Toast.makeText(context, "IDX_ACTIVE", Toast.LENGTH_SHORT).show()
-                    }
-
-                    IDX_COMPLETED -> {
-                        Toast.makeText(context, "IDX_COMPLETED", Toast.LENGTH_SHORT).show()
-                    }
-                }
+                completedIndex = i
+                refreshListItems(completedIndex)
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>) {
@@ -93,24 +85,57 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
-    private fun getItemsFromDB() {
+    private fun refreshListItems(idx: Int) {
+        when (idx) {
+            IDX_ALL -> {
+                getAll()
+            }
+            IDX_ACTIVE, IDX_COMPLETED -> {
+                getByCompleted(idx)
+            }
+        }
+    }
+
+    private fun getAll() {
         Thread {
-            items.clear()
-            items.addAll(db!!.itemDao().getAll())
+            val items = db!!.itemDao().getAll()
+            b.itemCount = db!!.itemDao().getActiveCount()
+            DLog.e("getAll\n" + GsonBuilder().setPrettyPrinting().create().toJson(items))
+            runOnUiThread {
+                adapter.updateItems(items)
+            }
         }.start()
-        adapter.notifyDataSetChanged()
     }
 
-    private fun insertItemToDB(item: ListItem) {
-        Thread { db!!.itemDao().insert(item) }.start()
+    private fun getByCompleted(idx: Int) {
+        val completed = idx == IDX_COMPLETED
+        Thread {
+            val items = db!!.itemDao().getItemByCompleted(completed)
+            b.itemCount = db!!.itemDao().getActiveCount()
+            DLog.e("getByCompleted\n" + GsonBuilder().setPrettyPrinting().create().toJson(items))
+            runOnUiThread { adapter.updateItems(items) }
+        }.start()
     }
 
-    private fun deleteItemFromDB(item: ListItem) {
-        Thread { db!!.itemDao().delete(item) }.start()
+    private fun insertToDB(item: ListItem) {
+        Thread {
+            db!!.itemDao().insert(item)
+            refreshListItems(completedIndex)
+        }.start()
+    }
+
+    private fun deleteFromDB(item: ListItem) {
+        Thread {
+            db!!.itemDao().delete(item)
+            refreshListItems(completedIndex)
+        }.start()
     }
 
     private fun clearCompleted() {
-
+        Thread {
+            db!!.itemDao().deleteCompleted()
+            refreshListItems(completedIndex)
+        }.start()
     }
 
     fun addItem() {
@@ -141,16 +166,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
 
         val item = ListItem(null, false, b.etAddItem.text.toString().trim(), 0, System.currentTimeMillis(), 0L)
-        DLog.e(GsonBuilder().setPrettyPrinting().create().toJson(item))
-        insertItemToDB(item).also {
-            getItemsFromDB()
-        }
+        insertToDB(item)
 
         b.etAddItem.setText("")
         b.etAddItem.requestFocus()
-//        b.nsvItems.postDelayed({
-//            b.nsvItems.fullScroll(NestedScrollView.FOCUS_DOWN)
-//        }, 100)
+
+        b.nsvItems.let {
+            it.postDelayed({
+                it.fullScroll(NestedScrollView.FOCUS_DOWN)
+            }, 100)
+        }
     }
 
     fun cancelItem() {
@@ -163,10 +188,21 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            when(requestCode) {
+                Constants.REQ_EDIT_ITEM -> {
+                    getByCompleted(completedIndex)
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         db!!.close()
+    }
+
+    fun test() {
+        b.nsvItems.fullScroll(NestedScrollView.FOCUS_DOWN)
     }
 }
