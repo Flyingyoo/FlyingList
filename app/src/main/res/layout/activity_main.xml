@@ -61,7 +61,7 @@
                 android:textColor="@color/color_333333"/>
 
         <androidx.core.widget.NestedScrollView
-                android:id="@+id/sv_items"
+                android:id="@+id/nsv_items"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_0dp"
                 app:layout_constraintTop_toBottomOf="@id/tv_left_cnt"

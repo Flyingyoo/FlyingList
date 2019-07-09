@@ -7,14 +7,18 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.flyingyoo.flyinglist.R
 import com.flyingyoo.flyinglist.adapter.RecyclerListItemAdapter
 import com.flyingyoo.flyinglist.base.BaseActivity
 import com.flyingyoo.flyinglist.base.BaseRecyclerViewAdapter
 import com.flyingyoo.flyinglist.constant.Constants
+import com.flyingyoo.flyinglist.data.database.ItemDB
 import com.flyingyoo.flyinglist.databinding.ActivityMainBinding
 import com.flyingyoo.flyinglist.data.dto.ListItem
 import com.flyingyoo.flyinglist.util.CommonUtils
+import com.flyingyoo.flyinglist.util.DLog
+import com.google.gson.GsonBuilder
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
@@ -25,7 +29,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private lateinit var adapter: RecyclerListItemAdapter
-    private val items: MutableList<ListItem> = arrayListOf()
+    private var db: ItemDB? = null
+    private val items: MutableList<ListItem> = mutableListOf()
 
 
     override fun getLayoutId(): Int {
@@ -34,7 +39,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        db = ItemDB.getInstance(context)
         b.activity = this
         b.itemCount = 0
 
@@ -43,28 +48,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private fun initRecycler() {
-
-        items.add(ListItem("1", false, "크하하핳1", 0, 0L, 0L))
-        items.add(ListItem("2", false, "크하하핳2", 0, 0L, 0L))
-        items.add(ListItem("3", true, "크하하핳3", 0, 0L, 0L))
-        items.add(ListItem("4", true, "크하하핳4", 0, 0L, 0L))
-        items.add(ListItem("5", true, "크하하핳5", 0, 0L, 0L))
-        items.add(ListItem("6", true, "크하하핳6", 0, 0L, 0L))
-        items.add(ListItem("7", true, "크하하핳7", 0, 0L, 0L))
-        items.add(ListItem("8", true, "크하하핳8", 0, 0L, 0L))
-        items.add(ListItem("9", true, "크하하핳9", 0, 0L, 0L))
-        items.add(ListItem("10", true, "크하하핳10", 0, 0L, 0L))
-        items.add(ListItem("11", true, "크하하핳11", 0, 0L, 0L))
-        items.add(ListItem("12", true, "크하하핳12", 0, 0L, 0L))
-        items.add(ListItem("13", true, "크하하핳13", 0, 0L, 0L))
-        items.add(ListItem("14", true, "크하하핳14", 0, 0L, 0L))
-        items.add(ListItem("15", true, "크하하핳15", 0, 0L, 0L))
-        items.add(ListItem("16", true, "크하하핳16", 0, 0L, 0L))
-        items.add(ListItem("17", true, "크하하핳17", 0, 0L, 0L))
-        items.add(ListItem("18", true, "크하하핳18", 0, 0L, 0L))
-        items.add(ListItem("19", true, "크하하핳19", 0, 0L, 0L))
-        items.add(ListItem("20", true, "크하하핳20", 0, 0L, 0L))
-
         adapter = RecyclerListItemAdapter(context, items)
 
         adapter.onItemClickListener = object : BaseRecyclerViewAdapter.OnItemClickListener {
@@ -77,6 +60,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         b.rvItemList.layoutManager = LinearLayoutManager(context)
         b.rvItemList.adapter = adapter
         b.rvItemList.isNestedScrollingEnabled = false
+        LinearSnapHelper().attachToRecyclerView(b.rvItemList)
+
+        getItemDB().start()
     }
 
     private fun initFilterSpinner() {
@@ -100,6 +86,19 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             override fun onNothingSelected(adapterView: AdapterView<*>) {
 
             }
+        }
+    }
+
+    private fun getItemDB() : Thread {
+        return Thread {
+            items.addAll(db!!.itemDao().getAll())
+            DLog.e("접속 성공!" + GsonBuilder().setPrettyPrinting().create().toJson(db!!.itemDao().getAll()))
+        }
+    }
+
+    private fun insertItem(item: ListItem) : Thread {
+        return Thread {
+            db!!.itemDao().insert(item)
         }
     }
 
@@ -134,9 +133,15 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             return
         }
 
-        items.add(ListItem("123", false, b.etAddItem.text.toString().trim(), 0, 0, 0))
+        val item = ListItem(null, false, b.etAddItem.text.toString().trim(), 0, System.currentTimeMillis(), 0L)
+        items.add(item)
+        DLog.e(GsonBuilder().setPrettyPrinting().create().toJson(item))
         adapter.notifyItemInserted(adapter.itemCount - 1)
         b.etAddItem.setText("")
+        b.etAddItem.requestFocus()
+
+        insertItem(item).start()
+        //b.nsvItems.fullScroll(NestedScrollView.FOCUS_DOWN)
     }
 
     fun cancelItem() {
@@ -149,6 +154,5 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
     }
 }

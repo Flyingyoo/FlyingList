@@ -6,7 +6,10 @@ package com.flyingyoo.flyinglist.constant
 
 class Constants {
     companion object {
-        const val DB_NAME = "items.db"
         const val REQ_EDIT_ITEM = 100
+        const val TABLE_NAME = "items"
+        const val DB_NAME = "items.db"
+
+
     }
 }
