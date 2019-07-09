@@ -64,13 +64,15 @@ class EditItemActivity : BaseActivity<ActivityEditItemBinding>() {
             return
         }
 
+        b.item!!.contents = b.etContent.text.toString().trim()
+        b.item!!.editedTime = System.currentTimeMillis()
+        b.item!!.completed = b.chkCompleted.isChecked
+        updateFromDB(b.item!!)
+
         setResult(Activity.RESULT_OK)
         finishWithAnimation(R.anim.anim_no_animation, R.anim.anim_drop_down)
     }
 
-    fun exit() {
-        finishWithAnimation(R.anim.anim_no_animation, R.anim.anim_drop_down)
-    }
 
     private fun getItemFromDB(itemId: Int) {
         Thread {
@@ -81,6 +83,9 @@ class EditItemActivity : BaseActivity<ActivityEditItemBinding>() {
     }
 
     private fun setMetaData(item: ListItem) {
+
+        val viewCnt = "View ${item.viewCount} times"
+        b.tvViewCnt.text = viewCnt
 
         b.etContent.setText(b.item!!.contents)
 
@@ -112,9 +117,11 @@ class EditItemActivity : BaseActivity<ActivityEditItemBinding>() {
 
     private fun deleteItemFromDB(item: ListItem) = Thread { db!!.itemDao().delete(item) }.start()
 
-    private fun updateFromDB(item: ListItem) {
+    private fun updateFromDB(item: ListItem) = Thread { db!!.itemDao().update(item) }.start()
 
-        Thread { db!!.itemDao().update(item) }.start()
+    override fun onBackPressed() {
+        //super.onBackPressed()
+        finishWithAnimation(R.anim.anim_no_animation, R.anim.anim_drop_down)
     }
 
 }

@@ -40,7 +40,7 @@
                     android:layout_height="match_parent"
                     layout="@layout/view_close"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:onClick="@{v -> activity.exit()}"
+                    android:onClick="@{v -> activity.onBackPressed()}"
             />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -49,8 +49,20 @@
                 android:id="@+id/cl_date_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/cl_header"
-        >
+                app:layout_constraintTop_toBottomOf="@id/cl_header">
+
+            <TextView
+                    android:id="@+id/tv_view_cnt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_create_date"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:padding="@dimen/_5dp"
+                    android:textColor="@color/color_999999"
+                    android:singleLine="true"
+                    android:maxLines="1"
+
+            />
 
             <TextView
                     android:id="@+id/tv_create_date"
@@ -58,8 +70,11 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toTopOf="@id/tv_edit_date"
                     app:layout_constraintEnd_toEndOf="parent"
+                    android:gravity="center_vertical|end"
                     android:padding="@dimen/_5dp"
                     android:textColor="@color/color_333333"
+                    android:singleLine="true"
+                    android:maxLines="1"
             />
 
             <TextView
@@ -68,9 +83,12 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    android:gravity="center_vertical|end"
                     android:padding="@dimen/_5dp"
                     android:visibility='@{item.editedTime == 0L ? View.GONE : View.VISIBLE}'
                     android:textColor="@color/color_333333"
+                    android:singleLine="true"
+                    android:maxLines="1"
             />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -88,17 +106,31 @@
                 android:gravity="top|start"
                 android:hint="@string/item_hint"
                 android:textColor="@color/color_333333"
+                android:layout_marginBottom="@dimen/_5dp"
         />
 
         <TextView
                 android:id="@+id/tv_length"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@id/ll_bottom"
+                app:layout_constraintBottom_toTopOf="@id/chk_completed"
+                app:layout_constraintEnd_toEndOf="parent"
                 android:textColor="@color/color_999999"
                 android:text="(0/300)"
-                android:gravity="end"
-                android:padding="@dimen/_10dp"
+                android:layout_marginEnd="@dimen/_10dp"
+                android:layout_marginBottom="@dimen/_5dp"
+        />
+
+        <CheckBox
+                android:id="@+id/chk_completed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_completed"
+                android:checked="@{item.completed}"
+                android:paddingBottom="@dimen/_3dp"
+                android:layout_marginEnd="@dimen/_10dp"
+                app:layout_constraintBottom_toTopOf="@id/ll_bottom"
+                app:layout_constraintEnd_toEndOf="parent"
         />
 
         <LinearLayout

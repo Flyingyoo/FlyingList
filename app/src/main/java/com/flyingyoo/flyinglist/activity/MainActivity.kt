@@ -2,13 +2,16 @@ package com.flyingyoo.flyinglist.activity
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Canvas
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.core.widget.NestedScrollView
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.flyingyoo.flyinglist.R
 import com.flyingyoo.flyinglist.adapter.RecyclerListItemAdapter
 import com.flyingyoo.flyinglist.base.BaseActivity
@@ -18,11 +21,10 @@ import com.flyingyoo.flyinglist.data.database.ItemDB
 import com.flyingyoo.flyinglist.databinding.ActivityMainBinding
 import com.flyingyoo.flyinglist.data.dto.ListItem
 import com.flyingyoo.flyinglist.security.SecurityUtils
-import com.flyingyoo.flyinglist.util.CommonUtils
-import com.flyingyoo.flyinglist.util.DLog
+import com.flyingyoo.flyinglist.util.*
 import com.google.gson.GsonBuilder
 
-class MainActivity : BaseActivity<ActivityMainBinding>() {
+class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSwipeListener {
 
     companion object {
         private const val IDX_ALL = 0
@@ -59,9 +61,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 val item = items[position]
                 val intent = Intent(context, EditItemActivity::class.java)
                 intent.putExtra(Constants.ID, item.id)
-                //item.viewCount++
-                //db!!.itemDao().update(item)
-                startActivityForResultWithAnimation(intent, Constants.REQ_EDIT_ITEM, R.anim.anim_rise_up, R.anim.anim_no_animation)
+                increaseViewCount(item.id!!)
+                startActivityForResultWithAnimation(
+                    intent,
+                    Constants.REQ_EDIT_ITEM,
+                    R.anim.anim_rise_up,
+                    R.anim.anim_no_animation
+                )
             }
         }
 
@@ -69,6 +75,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         b.rvItemList.adapter = adapter
         b.rvItemList.isNestedScrollingEnabled = false
         LinearSnapHelper().attachToRecyclerView(b.rvItemList)
+
+        val swipeCallback = SwipeCallback(this)
+        val itemTouchHelper = ItemTouchHelper(swipeCallback)
+        itemTouchHelper.attachToRecyclerView(b.rvItemList)
+
         getAll()
     }
 
@@ -121,6 +132,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         Thread {
             db!!.itemDao().insert(item)
             refreshListItems(completedIndex)
+            runOnUiThread {
+                b.etAddItem.setText("")
+                b.etAddItem.requestFocus()
+                b.nsvItems.let {
+                    it.postDelayed({
+                        it.fullScroll(NestedScrollView.FOCUS_DOWN)
+                    }, 100)
+                }
+            }
+
         }.start()
     }
 
@@ -128,6 +149,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         Thread {
             db!!.itemDao().delete(item)
             refreshListItems(completedIndex)
+        }.start()
+    }
+
+    private fun increaseViewCount(id: Int) {
+        Thread {
+            db!!.itemDao().increaseViewCount(id)
         }.start()
     }
 
@@ -168,14 +195,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         val item = ListItem(null, false, b.etAddItem.text.toString().trim(), 0, System.currentTimeMillis(), 0L)
         insertToDB(item)
 
-        b.etAddItem.setText("")
-        b.etAddItem.requestFocus()
-
-        b.nsvItems.let {
-            it.postDelayed({
-                it.fullScroll(NestedScrollView.FOCUS_DOWN)
-            }, 100)
-        }
+//        b.etAddItem.setText("")
+//        b.etAddItem.requestFocus()
+//
+//        b.nsvItems.let {
+//            it.postDelayed({
+//                it.fullScroll(NestedScrollView.FOCUS_DOWN)
+//            }, 100)
+//        }
     }
 
     fun cancelItem() {
@@ -189,9 +216,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
-            when(requestCode) {
+            when (requestCode) {
                 Constants.REQ_EDIT_ITEM -> {
-                    getByCompleted(completedIndex)
+                    refreshListItems(completedIndex)
                 }
             }
         }
@@ -204,5 +231,22 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     fun test() {
         b.nsvItems.fullScroll(NestedScrollView.FOCUS_DOWN)
+    }
+
+    override fun onItemSwipe(position: Int) {
+        CommonUtils.DialogUtil.showDialog(context,
+            R.string.msg_sure_to_delete,
+            false,
+            R.string.delete,
+            DialogInterface.OnClickListener { dialogInterface, _ ->
+                dialogInterface.dismiss()
+                deleteFromDB(items[position])
+            },
+            R.string.cancel,
+            DialogInterface.OnClickListener { dialogInterface, _ ->
+                dialogInterface.dismiss()
+                adapter.notifyItemChanged(position)
+            })
+
     }
 }

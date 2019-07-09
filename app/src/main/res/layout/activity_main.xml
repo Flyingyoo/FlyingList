@@ -34,6 +34,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:onClick="@{v -> activity.test()}"
+                android:visibility="gone"
         />
 
         <Spinner
@@ -43,6 +44,7 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_title"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginTop="@dimen/_20dp"
+                android:spinnerMode="dropdown"
                 android:entries="@array/filter_list"
         />
 
@@ -57,6 +59,8 @@
                 android:textColor="@color/color_999999"
                 android:background="@null"
                 android:minHeight="@dimen/_0dp"
+                android:paddingTop="@dimen/_10dp"
+                android:paddingStart="@dimen/_10dp"
                 android:onClick="@{v -> activity.showClearDialog()}"
         />
 
@@ -65,6 +69,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/spn_filter"
+                android:padding="@dimen/_5dp"
+                android:layout_marginStart="@dimen/_5dp"
+                android:layout_marginTop="@dimen/_5dp"
                 android:text='@{itemCount + " " + @string/main_left_items}'
                 android:textColor="@color/color_333333"/>
 
@@ -96,7 +103,46 @@
                         android:layout_height="wrap_content"
                         android:visibility="gone">
 
+                    <Button
+                            android:id="@+id/btn_confirm"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:background="@null"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:text="@string/confirm"
+                            android:textColor="@color/color_3282e4"
+                            android:onClick="@{v -> activity.confirmItem()}"
+                    />
+
+                    <Button
+                            android:id="@+id/btn_cancel"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:background="@null"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/btn_confirm"
+                            android:text="@string/cancel"
+                            android:textColor="@color/color_ff4848"
+                            android:onClick="@{v -> activity.cancelItem()}"
+                    />
+
                     <EditText
+                            android:id="@+id/et_add_item"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toBottomOf="@id/btn_confirm"
+                            android:padding="@dimen/_10dp"
+                            android:hint="@string/item_hint"
+                            android:background="@null"
+                            android:inputType="textMultiLine"
+                    />
+
+
+
+              <!--      <EditText
                             android:id="@+id/et_add_item"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -131,7 +177,7 @@
                             android:text="@string/cancel"
                             android:textColor="@color/color_ff4848"
                             android:onClick="@{v -> activity.cancelItem()}"
-                    />
+                    />-->
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

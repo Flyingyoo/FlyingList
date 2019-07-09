@@ -1,40 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
-        <import
-                alias="View"
-                type="android.view.View"
-        />
-
         <variable name="item" type="com.flyingyoo.flyinglist.data.dto.ListItem"/>
     </data>
 
-    <!--
-        flyingyoo.
-        there is an issue for using constraint layout for root layout.
-        that's why I used Relative layout.
-    -->
-
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_5dp"
+            android:layout_marginEnd="@dimen/_5dp"
+            android:layout_marginTop="@dimen/_3dp"
+            android:layout_marginBottom="@dimen/_3dp"
+            app:cardCornerRadius="@dimen/_5dp"
+            app:elevation="@dimen/_10dp">
 
-        <TextView
-                android:id="@+id/tv_content"
+        <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:padding="@dimen/_10dp"
-                android:background="@null"
-                android:maxLength="300"
-                android:textSize="@dimen/_17dp"
-                android:textColor="@color/color_333333"
-                android:text="@{item.contents}"
-                android:maxLines="3"
-        />
+                >
 
-    </RelativeLayout>
+            <TextView
+                    android:id="@+id/tv_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:padding="@dimen/_10dp"
+                    android:background="@null"
+                    android:maxLength="300"
+                    android:textSize="@dimen/_17dp"
+                    android:textColor="@color/color_333333"
+                    app:contents="@{item.contents}"
+                    app:isCompleted="@{item.completed}"
+                    android:maxLines="3"
+                    android:ellipsize="end"/>
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
 </layout>

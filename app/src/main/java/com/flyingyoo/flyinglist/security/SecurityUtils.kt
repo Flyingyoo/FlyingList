@@ -3,19 +3,7 @@ package com.flyingyoo.flyinglist.security
 import android.app.Activity
 import android.app.AlertDialog
 import android.os.Environment
-import android.text.TextUtils
-import android.util.Base64
 import java.io.File
-import java.nio.charset.StandardCharsets
-import java.security.InvalidAlgorithmParameterException
-import java.security.InvalidKeyException
-import java.security.NoSuchAlgorithmException
-import javax.crypto.BadPaddingException
-import javax.crypto.Cipher
-import javax.crypto.IllegalBlockSizeException
-import javax.crypto.NoSuchPaddingException
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 object SecurityUtils {
 
@@ -141,53 +129,6 @@ object SecurityUtils {
                     }
                 }
                 return result
-            }
-        }
-    }
-
-    class AES256Cipher {
-        companion object {
-            private const val SECRET_KEY = "38173156422918137132636764468992"
-            private val IV = SECRET_KEY.substring(0, 16)
-            private const val ALGORITHM = "AES"
-            private const val TRANSFORMATION = "AES/CBC/PKCS5Padding"
-
-            @Throws(
-                java.io.UnsupportedEncodingException::class,
-                NoSuchAlgorithmException::class,
-                NoSuchPaddingException::class,
-                InvalidAlgorithmParameterException::class,
-                InvalidKeyException::class,
-                IllegalBlockSizeException::class,
-                BadPaddingException::class
-            )
-            fun aesEncode(str: String): String {
-                if (TextUtils.isEmpty(str)) return ""
-                val keyData = SECRET_KEY.toByteArray()
-                val secretKey = SecretKeySpec(keyData, ALGORITHM)
-                val c = Cipher.getInstance(TRANSFORMATION)
-                c.init(Cipher.ENCRYPT_MODE, secretKey, IvParameterSpec(IV.toByteArray()))
-                val encrypted = c.doFinal(str.toByteArray(StandardCharsets.UTF_8))
-                return String(Base64.encode(encrypted, 0))
-            }
-
-            @Throws(
-                java.io.UnsupportedEncodingException::class,
-                NoSuchAlgorithmException::class,
-                NoSuchPaddingException::class,
-                InvalidAlgorithmParameterException::class,
-                InvalidKeyException::class,
-                IllegalBlockSizeException::class,
-                BadPaddingException::class
-            )
-            fun aesDecode(str: String): String {
-                if (TextUtils.isEmpty(str)) return ""
-                val keyData = SECRET_KEY.toByteArray()
-                val secretKey = SecretKeySpec(keyData, ALGORITHM)
-                val c = Cipher.getInstance(TRANSFORMATION)
-                c.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(IV.toByteArray(StandardCharsets.UTF_8)))
-                val byteStr = Base64.decode(str.toByteArray(), 0)
-                return String(c.doFinal(byteStr), StandardCharsets.UTF_8)
             }
         }
     }
