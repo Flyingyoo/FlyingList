@@ -2,16 +2,14 @@ package com.flyingyoo.flyinglist.activity
 
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Canvas
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.Toast
-import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.flyingyoo.flyinglist.R
 import com.flyingyoo.flyinglist.adapter.RecyclerListItemAdapter
 import com.flyingyoo.flyinglist.base.BaseActivity
@@ -23,6 +21,7 @@ import com.flyingyoo.flyinglist.data.dto.ListItem
 import com.flyingyoo.flyinglist.security.SecurityUtils
 import com.flyingyoo.flyinglist.util.*
 import com.google.gson.GsonBuilder
+
 
 class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSwipeListener {
 
@@ -48,10 +47,23 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSw
             b.activity = this
             b.itemCount = 0
 
+            initInputAddItem()
             initRecycler()
             initFilterSpinner()
         }
     }
+
+    private fun initInputAddItem() {
+        b.etAddItem.setOnEditorActionListener { _, actionId, _ ->
+            when(actionId) {
+                EditorInfo.IME_ACTION_DONE -> {
+                    addItem()
+                }
+            }
+            false
+        }
+    }
+
 
     private fun initRecycler() {
         adapter = RecyclerListItemAdapter(context, items)
@@ -61,6 +73,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSw
                 val item = items[position]
                 val intent = Intent(context, EditItemActivity::class.java)
                 intent.putExtra(Constants.ID, item.id)
+                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 increaseViewCount(item.id!!)
                 startActivityForResultWithAnimation(
                     intent,
@@ -79,8 +92,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSw
         val swipeCallback = SwipeCallback(this)
         val itemTouchHelper = ItemTouchHelper(swipeCallback)
         itemTouchHelper.attachToRecyclerView(b.rvItemList)
-
-        getAll()
     }
 
     private fun initFilterSpinner() {
@@ -132,16 +143,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSw
         Thread {
             db!!.itemDao().insert(item)
             refreshListItems(completedIndex)
-            runOnUiThread {
-                b.etAddItem.setText("")
-                b.etAddItem.requestFocus()
-                b.nsvItems.let {
-                    it.postDelayed({
-                        it.fullScroll(NestedScrollView.FOCUS_DOWN)
-                    }, 100)
-                }
-            }
-
         }.start()
     }
 
@@ -165,12 +166,31 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSw
         }.start()
     }
 
-    fun addItem() {
+    fun visibleAddViews() {
         b.clAddItem.visibility = View.VISIBLE
-        b.btnAddItem.visibility = View.GONE
+        b.btnVisibleAdd.visibility = View.GONE
         b.etAddItem.requestFocus()
 
         CommonUtils.SoftKeyBoardUtil.showKeyboard(context, b.etAddItem)
+    }
+
+    fun addItem() {
+        if (b.etAddItem.text.toString().trim() == "") {
+            Toast.makeText(context, R.string.msg_please_fill_content, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val item = ListItem(null, false, b.etAddItem.text.toString().trim(), 0, System.currentTimeMillis(), 0L)
+        insertToDB(item)
+        b.etAddItem.setText("")
+        CommonUtils.SoftKeyBoardUtil.hideKeyboard(context, b.etAddItem)
+    }
+
+    fun cancelItem() {
+        b.clAddItem.visibility = View.GONE
+        b.btnVisibleAdd.visibility = View.VISIBLE
+        b.etAddItem.setText("")
+        CommonUtils.SoftKeyBoardUtil.hideKeyboard(context, b.etAddItem)
     }
 
     fun showClearDialog() {
@@ -186,33 +206,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSw
             })
     }
 
-    fun confirmItem() {
-        if (b.etAddItem.text.toString().trim() == "") {
-            Toast.makeText(context, R.string.msg_please_fill_content, Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val item = ListItem(null, false, b.etAddItem.text.toString().trim(), 0, System.currentTimeMillis(), 0L)
-        insertToDB(item)
-
-//        b.etAddItem.setText("")
-//        b.etAddItem.requestFocus()
-//
-//        b.nsvItems.let {
-//            it.postDelayed({
-//                it.fullScroll(NestedScrollView.FOCUS_DOWN)
-//            }, 100)
-//        }
-    }
-
-    fun cancelItem() {
-        b.clAddItem.visibility = View.GONE
-        b.btnAddItem.visibility = View.VISIBLE
-        b.etAddItem.setText("")
-
-        CommonUtils.SoftKeyBoardUtil.hideKeyboard(context, b.etAddItem)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
@@ -222,15 +215,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSw
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        db!!.close()
-    }
-
-    fun test() {
-        b.nsvItems.fullScroll(NestedScrollView.FOCUS_DOWN)
     }
 
     override fun onItemSwipe(position: Int) {
