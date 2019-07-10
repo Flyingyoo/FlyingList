@@ -62,6 +62,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSw
             }
             false
         }
+
+        b.etAddItem.onFocusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
+            if(hasFocus) b.nsvItems.scrollTo(b.etAddItem.left, b.etAddItem.bottom)
+        }
     }
 
 
@@ -183,7 +187,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSw
         val item = ListItem(null, false, b.etAddItem.text.toString().trim(), 0, System.currentTimeMillis(), 0L)
         insertToDB(item)
         b.etAddItem.setText("")
-        CommonUtils.SoftKeyBoardUtil.hideKeyboard(context, b.etAddItem)
+        b.etAddItem.postDelayed({
+            CommonUtils.SoftKeyBoardUtil.showKeyboard(context, b.etAddItem)
+        },300)
+        b.etAddItem.requestFocus()
     }
 
     fun cancelItem() {

@@ -105,6 +105,7 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             android:text="@string/add"
+                            android:visibility="visible"
                             android:textColor="@color/color_3282e4"
                             android:onClick="@{v -> activity.addItem()}"
                     />
