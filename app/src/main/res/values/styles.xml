@@ -6,10 +6,4 @@
         <item name="colorAccent">@color/color_3282e4</item>
     </style>
 
-    <style name="CustomButton" parent="Widget.AppCompat.Button">
-        <item name="android:minHeight">@dimen/_0dp</item>
-
-
-    </style>
-
 </resources>

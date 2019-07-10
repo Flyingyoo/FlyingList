@@ -62,10 +62,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), SwipeCallback.OnItemSw
             }
             false
         }
-
-        b.etAddItem.onFocusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
-            if(hasFocus) b.nsvItems.scrollTo(b.etAddItem.left, b.etAddItem.bottom)
-        }
     }
 
 
